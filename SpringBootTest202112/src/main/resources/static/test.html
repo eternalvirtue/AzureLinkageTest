@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>試算I/Fサンプル</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.2/css/bulma.min.css"/>
+    <style type="text/css">
+        .input {width:10em;}
+        .checkbox {line-height:2;}
+        .inner-text {line-height:2;}
+        .money-column { text-align:right; }
+        #loader {
+         width : 100%;
+         height : 100%;
+         display : none;
+         position : absolute;
+         background-color : #000;
+         opacity : 0;
+         z-index : -1;   
+        }
+        @-webkit-keyframes fadeIn {
+         from {
+             opacity : 0;
+             z-index : -1;
+        } to {
+            opacity : 0.5;
+            z-index: 999;
+        } 
+        }
+        @keyframes fadeIn {
+         from {
+             opacity : 0;
+             z-index : -1;
+        } to {
+            opacity : 0.5;
+            z-index: 999;
+        } 
+        }
+        #loader.processing {
+            -webkit-animation : fadeIn 1s forwards;
+            animation : fadeIn 1s forwards;
+            display : block;
+        }
+        .sk-cube-grid {
+  width: 40px;
+  height: 40px;
+  position : absolute;
+  top : 0;
+  right : 0;
+  bottom : 0;
+  left : 0;
+  margin: auto;
+}
+.sk-cube-grid .sk-cube {
+  width: 33%;
+  height: 33%;
+  background-color: #fff;
+  float: left;
+  -webkit-animation: sk-cubeGridScaleDelay 1.3s infinite ease-in-out;
+          animation: sk-cubeGridScaleDelay 1.3s infinite ease-in-out; 
+}
+.sk-cube-grid .sk-cube1 {
+  -webkit-animation-delay: 0.2s;
+          animation-delay: 0.2s; }
+.sk-cube-grid .sk-cube2 {
+  -webkit-animation-delay: 0.3s;
+          animation-delay: 0.3s; }
+.sk-cube-grid .sk-cube3 {
+  -webkit-animation-delay: 0.4s;
+          animation-delay: 0.4s; }
+.sk-cube-grid .sk-cube4 {
+  -webkit-animation-delay: 0.1s;
+          animation-delay: 0.1s; }
+.sk-cube-grid .sk-cube5 {
+  -webkit-animation-delay: 0.2s;
+          animation-delay: 0.2s; }
+.sk-cube-grid .sk-cube6 {
+  -webkit-animation-delay: 0.3s;
+          animation-delay: 0.3s; }
+.sk-cube-grid .sk-cube7 {
+  -webkit-animation-delay: 0s;
+          animation-delay: 0s; }
+.sk-cube-grid .sk-cube8 {
+  -webkit-animation-delay: 0.1s;
+          animation-delay: 0.1s; }
+.sk-cube-grid .sk-cube9 {
+  -webkit-animation-delay: 0.2s;
+          animation-delay: 0.2s; }
+
+@-webkit-keyframes sk-cubeGridScaleDelay {
+  0%, 70%, 100% {
+    -webkit-transform: scale3D(1, 1, 1);
+            transform: scale3D(1, 1, 1);
+  } 35% {
+    -webkit-transform: scale3D(0, 0, 1);
+            transform: scale3D(0, 0, 1); 
+  }
+}
+
+@keyframes sk-cubeGridScaleDelay {
+  0%, 70%, 100% {
+    -webkit-transform: scale3D(1, 1, 1);
+            transform: scale3D(1, 1, 1);
+  } 35% {
+    -webkit-transform: scale3D(0, 0, 1);
+            transform: scale3D(0, 0, 1);
+  } 
+}
+    </style>
+</head>
+<body>
+<div id="loader">
+<div class="sk-cube-grid">
+  <div class="sk-cube sk-cube1"></div>
+  <div class="sk-cube sk-cube2"></div>
+  <div class="sk-cube sk-cube3"></div>
+  <div class="sk-cube sk-cube4"></div>
+  <div class="sk-cube sk-cube5"></div>
+  <div class="sk-cube sk-cube6"></div>
+  <div class="sk-cube sk-cube7"></div>
+  <div class="sk-cube sk-cube8"></div>
+  <div class="sk-cube sk-cube9"></div>
+</div>
+</div>
+    <section class = "section">
+         <div class = "container">
+            <span class = "title">試算I/Fサンプル なんちゃって損保メディカル系</span><br><br>
+            <form id="form" method="post" accept-charset="utf-8" return false>
+                <span class = "is-size-5">契約情報</span>
+                <div class="field is-horizontal">
+                    <div class="field-label is-normal"><label class = "label">証券番号</label></div>
+                    <div class="field-body"><input class ="input" name = "policyNo" type="text" placeholder="実際には自動採番だろうけど" value="M123456789"></div>
+                </div>
+                <div class="field is-horizontal">
+                    <div class="field-label is-normal"><label class = "label">保険期間</label></div>
+                    <div class="field-body">
+                        <input class="input" type="text" id="inceptDate" name="inceptDate" value="20190101">
+                        <span class = "is-size-6 inner-text">〜</span>
+                        <input class="input" type="text" id="expireDate" name="expireDate" value="20200101">
+                    </div>
+                </div>
+                <span class = "is-size-5">契約者兼被保険者情報</span>
+                <div class="field is-horizontal">
+                    <div class="field-label is-normal"><label class = "label">契約者漢字(姓・名)</label></div>
+                    <div class="field-body">
+                        <input class="input" type="text" id="lastNameKJ" name="lastNameKJ" value="運呼">
+                        <span class = "is-size-6 inner-text">・</span>
+                        <input class="input" type="text" id="firstNameKJ" name="firstNameKJ" value="太郎">
+                    </div>
+                </div>
+                <div class="field is-horizontal">
+                    <div class="field-label is-normal"><label class = "label">契約者カナ(姓・名)</label></div>
+                    <div class="field-body">
+                        <input class="input" type="text" id="lastNameKN" name="lastNameKN" value="ウンコ">
+                        <span class = "is-size-6 inner-text">・</span>
+                        <input class="input" type="text" id="firstNameKN" name="firstNameKN" value="タロウ">
+                    </div>
+                </div>
+                <div class="field is-horizontal">
+                    <div class="field-label is-normal"><label class = "label">生年月日</label></div>
+                    <div class="field-body">
+                        <input class="input" type="text" id="birthDay" name="birthDay" value="19900101">
+                    </div>
+                </div>
+                <div class="field is-horizontal">
+                    <div class="field-label is-normal"><label class = "label">性別</label></div>
+                    <div class="field-body">
+                        <input class="radio" type="radio" id="sex" name="sex" value="1"><span class = "is-size-6 inner-text">男性&nbsp;</span>
+                        <input class="radio" type="radio" id="sex" name="sex" value="2" checked><span class = "is-size-6 inner-text">女性</span>
+                    </div>
+                </div>
+                <div class="field is-horizontal">
+                    <div class="field-label is-normal"><label class = "label">郵便番号</label></div>
+                    <div class="field-body">
+                        <input class="input" type="text" id="zipNo" name="zipNo" value="1000001">
+                    </div>
+                </div>
+                 <div class="field is-horizontal">
+                    <div class="field-label is-normal"><label class = "label">住所</label></div>
+                    <div class="field-body">
+                        <input class="input" type="text" id="addressPrefecture" name="addressPrefecture" value="東京都">
+                        <span class = "is-size-6 inner-text">・</span>
+                        <input class="input" type="text" id="addressCity" name="addressCity" value="千代田区千代田">
+                        <span class = "is-size-6 inner-text">・</span>
+                        <input class="input" type="text" id="addressTown" name="addressTown" value="１番１号">
+                        <span class = "is-size-6 inner-text">・</span>
+                        <input class="input" type="text" id="addressBuild" name="addressBuild" value="">
+                    </div>
+                </div>
+                 <div class="field is-horizontal">
+                    <div class="field-label is-normal"><label class = "label">電話番号</label></div>
+                    <div class="field-body">
+                        <input class="input" type="text" id="telNo" name="telNo" value="03-0000-1111">
+                    </div>
+                </div>
+                <span class = "is-size-5">保障情報</span>
+                 <div class="field is-horizontal">
+                    <div class="field-label is-normal"><label class = "label">特約</label></div>
+                    <div class="field-body">
+                        <label class="checkbox"><input class="checkbox" type="checkbox" id="rider01" name="rider" value="01" checked>インターネット特約</label>
+                        <span class = "is-size-5 inner-text">&nbsp;</span>
+                        <label class="checkbox"><input class="checkbox" type="checkbox" id="rider02" name="rider" value="02" checked>契約開始90日前特約</label>
+                    </div>
+                </div>
+                 <div class="field is-horizontal">
+                    <div class="field-label is-normal"><label class = "label">入院日額</label></div>
+                    <div class="field-body">
+                        <input type="hidden" id="coverageCode001" name="coverageCode001" value="001">
+                        <span class = "is-size-6 inner-text">保険金額&nbsp;</span>
+                        <input class="input money-column" type="number" id="coverageAmount001" name="coverageAmount001" value="5">
+                        <span class = "is-size-6 inner-text">千円　保険料&nbsp;</span>
+                        <input class="input money-column" type="text" disabled id="coveragePrem001" name="coveragePrem001" value="">
+                        <span class = "is-size-6 inner-text">円</span>
+                    </div>
+                </div>
+                 <div class="field is-horizontal">
+                    <div class="field-label is-normal"><label class = "label">手術</label></div>
+                    <div class="field-body">
+                        <input type="hidden" id="coverageCode002" name="coverageCode002" value="002">
+                        <span class = "is-size-6 inner-text">保険金額&nbsp;</span>
+                        <input class="input money-column" type="number" id="coverageAmount002" name="coverageAmount002" value="50">
+                        <span class = "is-size-6 inner-text">千円　保険料&nbsp;</span>
+                        <input class="input money-column" type="text" disabled id="coveragePrem002" name="coveragePrem002" value="">
+                        <span class = "is-size-6 inner-text">円</span>
+                    </div>
+                </div>
+                 <div class="field is-horizontal">
+                    <div class="field-label is-normal"><label class = "label">がん放射線治療</label></div>
+                    <div class="field-body">
+                        <input type="hidden" id="coverageCode003" name="coverageCode003" value="003">
+                        <span class = "is-size-6 inner-text">保険金額&nbsp;</span>
+                        <input class="input money-column" type="number" id="coverageAmount003" name="coverageAmount003" value="50">
+                        <span class = "is-size-6 inner-text">千円　保険料&nbsp;</span>
+                        <input class="input money-column" type="text" disabled id="coveragePrem003" name="coveragePrem003" value="">
+                        <span class = "is-size-6 inner-text">円</span>
+                    </div>
+                </div>
+                 <div class="field is-horizontal">
+                    <div class="field-label is-normal"><label class = "label">先進医療</label></div>
+                    <div class="field-body">
+                        <input type="hidden" id="coverageCode004" name="coverageCode003" value="004">
+                        <span class = "is-size-6 inner-text">保険金額&nbsp;</span>
+                        <input class="input money-column" type="number" id="coverageAmount004" name="coverageAmount004" value="20000">
+                        <span class = "is-size-6 inner-text">千円　保険料&nbsp;</span>
+                        <input class="input money-column" type="text" disabled id="coveragePrem004" name="coveragePrem004" value="">
+                        <span class = "is-size-6 inner-text">円</span>
+                    </div>
+                </div>
+            </form>
+            <button class="button is-link is-outlined" id="calcButton" onclick='sendRequest(this)'>計算</button>
+            <div id="result"></div>
+            <ul id="errorCode"></ul>
+            <div id="responseData"></div>
+         </div>
+    </section>
+    <script type="text/javascript">
+        const  asyncGetCall = async () => {
+        // 各フィールドから値を取得してJSONデータを作成
+        let data = {};
+        const forms = document.querySelectorAll('form');
+        const form = forms[0];
+        Array.from(form.elements).forEach((input) => {
+            //console.log(input);
+            // テキスト項目はそのまま取得してセット
+            const name = input.getAttribute('name');
+            if (name !== "rider" && name !== "sex" && name.lastIndexOf("coverage", 0) !== 0 ) {
+                data[name] = input.value;
+            }            
+        });      
+        // 性別は選択した値
+        data.sex =  document.querySelector('#sex:checked').value;        
+        // 特約はチェックの入ったものだけ取得し、セット
+        let riders=[];
+        const elementRiders = document.getElementsByName('rider');
+        for(let i=0; elementRiders[i]; ++i){
+            if(elementRiders[i].checked){
+                riders.push(elementRiders[i].valuez);
+            }
+        }
+        data.rider = riders;
+        //  担保は個別に色々ゴリゴリ入りそうなのでベタ打ち
+        const coverage001 = {
+            code: document.getElementById("coverageCode001").value,
+            amount: parseInt(document.getElementById("coverageAmount001").value)
+        };
+        const coverage002 = {
+            code: document.getElementById("coverageCode002").value,
+            amount: parseInt(document.getElementById("coverageAmount002").value)
+        };
+        const coverage003 = {
+            code: document.getElementById("coverageCode003").value,
+            amount: parseInt(document.getElementById("coverageAmount003").value)
+        };
+        const coverage004 = {
+            code: document.getElementById("coverageCode004").value,
+            amount: parseInt(document.getElementById("coverageAmount004").value)
+        };
+        data.coverage = [coverage001, coverage002, coverage003, coverage004];
+
+        //const serverURL =  ' https://webcalc-test.azurewebsites.net/api/httptrigger1';
+        const serverURL =  ' http://localhost:8080/api/calc';
+            try {
+                const response = await fetch(serverURL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+                const resData = await response.json();
+                //console.log(resData);
+                // document.getElementsById('responseData').html(JSON.stringify(resData));
+                document.getElementById('result').innerHTML = '';
+                if (resData.resultCode == '000') {
+                    document.getElementById('result').innerHTML = "正常終了";
+                } else { 
+                    document.getElementById('result').innerHTML = "エラーが発生しました";
+                }
+                resData.errorCode.forEach((errorMsg) => {
+                    console.log("succeed");
+                    let div = document.getElementById("errorCode");
+                    let li = document.createElement("li");
+                    li.appendChild(document.createTextNode(errorMsg));
+                    div.appendChild(li);
+                });
+                if (resData.coverage !== undefined) {
+                    if (resData.coverage[0] !== undefined) {
+                        document.getElementById("coveragePrem001").value = resData.coverage[0].prem;
+                    }
+                    if (resData.coverage[1] !== undefined) {
+                        document.getElementById("coveragePrem002").value = resData.coverage[1].prem;
+                    }
+                    if (resData.coverage[2] !== undefined) {
+                        document.getElementById("coveragePrem003").value = resData.coverage[2].prem;
+                    }
+                    if (resData.coverage[3] !== undefined) {
+                        document.getElementById("coveragePrem004").value = resData.coverage[3].prem;
+                    }
+                }
+               } catch(error) {
+                   console.log(error);
+                   document.getElementById('responseData').innerHTML = "通信に失敗したか、サービスに影響のあるエラーが発生しました";
+                   //document.getElementById('responseData').innerHTML = data;
+                 } 
+        }
+
+    async function sendRequest(btn){
+        document.getElementById('loader').classList.add('processing');
+        document.getElementById('result').innerHTML = "";
+        document.getElementById('errorCode').innerHTML = "";
+        document.getElementById('responseData').innerHTML = '';
+        document.getElementById("coveragePrem001").value = '';
+        document.getElementById("coveragePrem002").value = '';
+        document.getElementById("coveragePrem003").value = '';
+        document.getElementById("coveragePrem004").value = '';
+        // 多重送信を防ぐため通信完了までボタンをdisableにする
+        btn.disabled = true;
+        document.getElementById('result').innerHTML = '処理中...';
+        await asyncGetCall();
+        btn.disabled = false; // ボタンを再び enableにする
+        document.getElementById('loader').classList.remove('processing');
+    }
+    </script>
+</body>
+</html>
